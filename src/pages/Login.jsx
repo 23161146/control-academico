@@ -2,8 +2,7 @@ import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { IconEye } from "../components/Icons.jsx";
 import foto from "../assets/login.jpg";
-
-const correoValido = (v) => /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(v);
+import { iniciarSesion } from "../services/validacionLogin.js";
 
 export default function Login({ onLogin }) {
   const navigate = useNavigate();
@@ -12,15 +11,31 @@ export default function Login({ onLogin }) {
   const [verClave, setVerClave] = useState(false);
   const [recordar, setRecordar] = useState(false);
   const [error, setError] = useState("");
+  const [cargando, setCargando] = useState(false);
 
-  const enviar = (e) => {
+  const enviar = async (e) => {
     e.preventDefault();
-    if (!correoValido(correo)) return setError("Ingresa un correo válido, por ejemplo nombre@correo.com.");
+    if (!correo.trim()) return setError("Ingresa un usuario válido.");
     if (clave.length < 4) return setError("La contraseña debe tener al menos 4 caracteres.");
     setError("");
-    // TODO: reemplazar por la llamada real a tu API de autenticación
-    onLogin(correo);
-    navigate("/inicio", { replace: true });
+    setCargando(true);
+
+    try {
+      const data = await iniciarSesion(correo, clave);
+
+      if (recordar) {
+        localStorage.setItem("token", data.accessToken);
+      } else {
+        sessionStorage.setItem("token", data.accessToken);
+      }
+
+      onLogin(data.firstName || data.username);
+      navigate("/inicio", { replace: true });
+    } catch (err) {
+      setError(err.message);
+    } finally {
+      setCargando(false);
+    }
   };
 
   return (
@@ -36,13 +51,31 @@ export default function Login({ onLogin }) {
           <h1>Iniciar sesión</h1>
           <p className="login__sub">Ingresa tus datos para continuar</p>
 
-          <label htmlFor="correo">Correo</label>
-          <input id="correo" type="email" autoComplete="email" value={correo} onChange={(e) => setCorreo(e.target.value)} />
+          <label htmlFor="correo">Usuario</label>
+          <input
+            id="correo"
+            type="email"
+            autoComplete="email"
+            placeholder="ej. emilys"
+            value={correo}
+            onChange={(e) => setCorreo(e.target.value)}
+          />
 
           <label htmlFor="clave">Contraseña</label>
           <div className="login__pass">
-            <input id="clave" type={verClave ? "text" : "password"} autoComplete="current-password" value={clave} onChange={(e) => setClave(e.target.value)} />
-            <button type="button" aria-label={verClave ? "Ocultar contraseña" : "Mostrar contraseña"} onClick={() => setVerClave((v) => !v)}>
+            <input
+              id="clave"
+              type={verClave ? "text" : "password"}
+              autoComplete="current-password"
+              placeholder="••••••••"
+              value={clave}
+              onChange={(e) => setClave(e.target.value)}
+            />
+            <button
+              type="button"
+              aria-label={verClave ? "Ocultar contraseña" : "Mostrar contraseña"}
+              onClick={() => setVerClave((v) => !v)}
+            >
               <IconEye off={verClave} />
             </button>
           </div>
@@ -55,10 +88,18 @@ export default function Login({ onLogin }) {
             <a href="#recuperar">¿Olvidaste tu contraseña?</a>
           </div>
 
-          {error && <p className="login__error" role="alert">{error}</p>}
+          {error && (
+            <p className="login__error" role="alert">
+              {error}
+            </p>
+          )}
 
-          <button className="login__submit" type="submit">Iniciar Sesión</button>
-          <a className="login__register" href="#registro">¿No tienes cuenta? Regístrate</a>
+          <button className="login__submit" type="submit">
+            Iniciar Sesión
+          </button>
+          <a className="login__register" href="#registro">
+            ¿No tienes cuenta? Regístrate
+          </a>
         </form>
       </div>
     </div>
