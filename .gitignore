@@ -1,0 +1,5 @@
+# Dependencias instaladas por npm
+node_modules/
+
+# Compilado generado por Vite
+dist/
