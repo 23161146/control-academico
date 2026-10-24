@@ -23,13 +23,12 @@ export default function Login({ onLogin }) {
     try {
       const data = await iniciarSesion(correo, clave);
 
-      if (recordar) {
-        localStorage.setItem("token", data.accessToken);
-      } else {
-        sessionStorage.setItem("token", data.accessToken);
-      }
+      const storage = recordar ? localStorage : sessionStorage;
 
-      onLogin(data.firstName || data.username);
+      storage.setItem("token", data.accessToken);
+      storage.setItem("user", JSON.stringify(data));
+
+      onLogin(data);
       navigate("/inicio", { replace: true });
     } catch (err) {
       setError(err.message);

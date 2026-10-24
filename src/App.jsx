@@ -13,21 +13,29 @@ const Pendiente = ({ titulo }) => (
 );
 
 export default function App() {
-  const [usuario, setUsuario] = useState(() => localStorage.getItem("usuario"));
+  // Leer el objeto completo del usuario si ya estaba guardado
+  const [usuario, setUsuario] = useState(() => {
+    const guardado = localStorage.getItem("user") || sessionStorage.getItem("user");
+    return guardado ? JSON.parse(guardado) : null;
+  });
 
-  const entrar = (correo) => {
-    localStorage.setItem("usuario", correo);
-    setUsuario(correo);
+  const entrar = (userData) => {
+    setUsuario(userData); // Guardar el objeto completo del usuario
   };
+
   const salir = () => {
+    localStorage.removeItem("token");
+    localStorage.removeItem("user");
     localStorage.removeItem("usuario");
+    sessionStorage.removeItem("token");
+    sessionStorage.removeItem("user");
     setUsuario(null);
   };
 
   return (
     <Routes>
       <Route path="/" element={usuario ? <Navigate to="/inicio" replace /> : <Login onLogin={entrar} />} />
-      <Route element={usuario ? <Layout onLogout={salir} /> : <Navigate to="/" replace />}>
+      <Route element={usuario ? <Layout usuario={usuario} onLogout={salir} /> : <Navigate to="/" replace />}>
         <Route path="/inicio" element={<Inicio />} />
         <Route path="/estudiantes" element={<Estudiantes />} />
         <Route path="/reportes" element={<Pendiente titulo="Reportes" />} />

@@ -1,3 +1,4 @@
+import { useState, useEffect } from "react";
 import { NavLink, Outlet, useNavigate } from "react-router-dom";
 import { IconBars, IconHome, IconUsers } from "./Icons.jsx";
 import avatar from "../assets/avatar.jpg";
@@ -9,12 +10,22 @@ const enlaces = [
   { to: "/horario", texto: "Horario", icono: <IconBars /> },
 ];
 
-export default function Layout({ onLogout }) {
+// Recibir usuario desde App.jsx
+export default function Layout({ usuario, onLogout }) {
   const navigate = useNavigate();
+
   const cerrarSesion = () => {
-    onLogout();
+    if (onLogout) onLogout();
     navigate("/", { replace: true });
   };
+
+  // Obtener el nombre y la foto de usuario
+  const nombreCompleto =
+    usuario?.firstName && usuario?.lastName
+      ? `${usuario.firstName} ${usuario.lastName}`
+      : usuario?.username || "Usuario";
+
+  const fotoPerfil = usuario?.image || avatar;
 
   return (
     <div className="shell">
@@ -38,8 +49,8 @@ export default function Layout({ onLogout }) {
         <header className="topbar">
           <strong>Control Académico</strong>
           <div className="topbar__user">
-            <span>Jose García</span>
-            <img src={avatar} alt="Foto de perfil de Jose García" />
+            <span>{nombreCompleto}</span>
+            <img src={fotoPerfil} alt={`Foto de perfil de ${nombreCompleto}`} />
           </div>
         </header>
         <main>
