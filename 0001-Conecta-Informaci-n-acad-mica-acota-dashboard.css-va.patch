@@ -1,0 +1,176 @@
+From c1ba4cef24866c691ce323429c7b7f3ee8ff2ddd Mon Sep 17 00:00:00 2001
+From: Claude <noreply@anthropic.com>
+Date: Mon, 26 Oct 2026 16:43:04 +0000
+Subject: [PATCH] =?UTF-8?q?Estudiantes:=20filtros=20mejorados=20y=20elimin?=
+ =?UTF-8?q?aci=C3=B3n=20simulada=20con=20confirmaci=C3=B3n?=
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+
+---
+ src/pages/Estudiantes.jsx | 75 +++++++++++++++++++++++++++++++++++----
+ src/styles.css            | 13 +++++++
+ 2 files changed, 81 insertions(+), 7 deletions(-)
+
+diff --git a/src/pages/Estudiantes.jsx b/src/pages/Estudiantes.jsx
+index c50fadc..7c34227 100644
+--- a/src/pages/Estudiantes.jsx
++++ b/src/pages/Estudiantes.jsx
+@@ -1,31 +1,69 @@
+-import { useMemo, useState } from "react";
++import { useEffect, useMemo, useState } from "react";
+ import { IconChevron } from "../components/Icons.jsx";
+ import { carreras, estudiantes, semestres } from "../data/estudiantes.js";
+ 
++// Para buscar sin importar mayúsculas ni acentos ("sofia" encuentra "Sofía")
++const limpiar = (texto) =>
++  String(texto).normalize("NFD").replace(/[\u0300-\u036f]/g, "").toLowerCase().trim();
++
+ export default function Estudiantes() {
++  // La lista vive en el estado para poder "eliminar" registros de forma simulada
++  const [lista, setLista] = useState(estudiantes);
+   const [busqueda, setBusqueda] = useState("");
+   const [carrera, setCarrera] = useState("");
+   const [semestre, setSemestre] = useState("");
+   const [porPagina, setPorPagina] = useState(5);
+   const [pagina, setPagina] = useState(1);
++  const [porEliminar, setPorEliminar] = useState(null); // estudiante pendiente de confirmar
++  const [aviso, setAviso] = useState("");
+ 
+   const filtrados = useMemo(() => {
+-    const q = busqueda.trim().toLowerCase();
+-    return estudiantes.filter(
++    const q = limpiar(busqueda);
++    return lista.filter(
+       (e) =>
+-        (!q || e.nombre.toLowerCase().includes(q) || e.correo.toLowerCase().includes(q)) &&
++        (!q || limpiar(e.nombre).includes(q) || limpiar(e.correo).includes(q)) &&
+         (!carrera || e.carrera === carrera) &&
+         (!semestre || e.semestre === Number(semestre))
+     );
+-  }, [busqueda, carrera, semestre]);
++  }, [lista, busqueda, carrera, semestre]);
+ 
+   const totalPaginas = Math.max(1, Math.ceil(filtrados.length / porPagina));
+   const actual = Math.min(pagina, totalPaginas);
+   const visibles = filtrados.slice((actual - 1) * porPagina, actual * porPagina);
++  const hayFiltros = busqueda || carrera || semestre;
+ 
+   // Cualquier cambio de filtro regresa a la primera página
+   const filtrar = (setter) => (e) => { setter(e.target.value); setPagina(1); };
+ 
++  const limpiarFiltros = () => {
++    setBusqueda("");
++    setCarrera("");
++    setSemestre("");
++    setPagina(1);
++  };
++
++  // Eliminación simulada: solo quita el registro de la lista en memoria (al recargar vuelve)
++  const confirmarEliminar = () => {
++    setLista((l) => l.filter((e) => e.id !== porEliminar.id));
++    setAviso(`Se eliminó a ${porEliminar.nombre}.`);
++    setPorEliminar(null);
++  };
++
++  // El aviso desaparece solo a los 4 segundos
++  useEffect(() => {
++    if (!aviso) return undefined;
++    const t = setTimeout(() => setAviso(""), 4000);
++    return () => clearTimeout(t);
++  }, [aviso]);
++
++  // Escape cierra el cuadro de confirmación
++  useEffect(() => {
++    if (!porEliminar) return undefined;
++    const alTeclear = (e) => e.key === "Escape" && setPorEliminar(null);
++    window.addEventListener("keydown", alTeclear);
++    return () => window.removeEventListener("keydown", alTeclear);
++  }, [porEliminar]);
++
+   return (
+     <section className="page page--gris">
+       <article className="card tabla-card">
+@@ -48,8 +86,15 @@ export default function Estudiantes() {
+             </select>
+             <IconChevron />
+           </div>
++          {hayFiltros && (
++            <button type="button" className="filtros__limpiar" onClick={limpiarFiltros}>
++              Limpiar filtros
++            </button>
++          )}
+         </div>
+ 
++        <p className="aviso" role="status" aria-live="polite">{aviso}</p>
++
+         <div className="tabla">
+           <table>
+             <thead>
+@@ -63,7 +108,10 @@ export default function Estudiantes() {
+                   <td>{e.carrera}</td>
+                   <td>{e.semestre}°</td>
+                   <td className="acciones">
+-                    <button type="button">Ver</button> · <button type="button">Editar</button>
++                    <button type="button">Ver</button> · <button type="button">Editar</button> ·{" "}
++                    <button type="button" className="acciones__eliminar" onClick={() => setPorEliminar(e)} aria-label={`Eliminar a ${e.nombre}`}>
++                      Eliminar
++                    </button>
+                   </td>
+                 </tr>
+               ))}
+@@ -83,7 +131,7 @@ export default function Estudiantes() {
+               </select>
+               <IconChevron />
+             </span>
+-            por página.
++            por página. ({filtrados.length} {filtrados.length === 1 ? "estudiante" : "estudiantes"})
+           </label>
+ 
+           <nav className="paginacion__nav" aria-label="Paginación">
+@@ -95,6 +143,19 @@ export default function Estudiantes() {
+           </nav>
+         </footer>
+       </article>
++
++      {porEliminar && (
++        <div className="modal" onClick={() => setPorEliminar(null)}>
++          <div className="modal__caja" role="alertdialog" aria-modal="true" aria-labelledby="modal-titulo" onClick={(e) => e.stopPropagation()}>
++            <h3 id="modal-titulo">Eliminar estudiante</h3>
++            <p>¿Seguro que quieres eliminar a <strong>{porEliminar.nombre}</strong>? Esta acción es una simulación y no modifica ninguna base de datos.</p>
++            <div className="modal__botones">
++              <button type="button" className="modal__cancelar" autoFocus onClick={() => setPorEliminar(null)}>Cancelar</button>
++              <button type="button" className="modal__confirmar" onClick={confirmarEliminar}>Eliminar</button>
++            </div>
++          </div>
++        </div>
++      )}
+     </section>
+   );
+ }
+diff --git a/src/styles.css b/src/styles.css
+index 77c29be..a588e98 100644
+--- a/src/styles.css
++++ b/src/styles.css
+@@ -102,6 +102,19 @@ td:last-child, th:last-child { border-right: 0; }
+ .acciones button { padding: 0; border: 0; background: none; font: inherit; }
+ .acciones button:hover { text-decoration: underline; color: var(--verde-700); }
+ .vacio { height: 120px; text-align: center; color: var(--verde-700); }
++.filtros__limpiar { height: 38px; padding: 0 14px; border: 1px solid var(--linea); border-radius: 6px; background: transparent; font: 600 12px var(--inter); color: var(--verde-700); cursor: pointer; }
++.filtros__limpiar:hover { background: var(--menta-50); }
++.aviso { min-height: 20px; margin: 0 0 8px; font: 600 13px var(--inter); color: var(--verde-700); }
++.acciones .acciones__eliminar { color: #a12b2b; }
++.acciones .acciones__eliminar:hover { color: #7d1f1f; }
++.modal { position: fixed; inset: 0; z-index: 50; display: grid; place-items: center; padding: 16px; background: rgba(24, 51, 51, 0.45); }
++.modal__caja { width: 100%; max-width: 420px; padding: 24px; border-radius: 12px; background: #fff; font-family: var(--inter); }
++.modal__caja h3 { margin: 0 0 8px; font-size: 18px; }
++.modal__caja p { margin: 0 0 20px; font-size: 14px; line-height: 1.5; color: var(--tinta); }
++.modal__botones { display: flex; justify-content: flex-end; gap: 10px; }
++.modal__botones button { height: 36px; padding: 0 16px; border-radius: 6px; font: 600 13px var(--inter); cursor: pointer; }
++.modal__cancelar { border: 1px solid var(--linea); background: #fff; color: var(--verde-900); }
++.modal__confirmar { border: 0; background: #a12b2b; color: #fff; }
+ 
+ .paginacion { display: flex; flex-wrap: wrap; justify-content: space-between; align-items: center; gap: 16px; margin-top: 28px; padding: 0 4px; font: 500 14px var(--inter); color: var(--verde-700); }
+ .paginacion__tam { display: flex; align-items: center; margin: 0; }
+-- 
+2.43.0
