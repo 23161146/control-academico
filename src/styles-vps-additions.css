@@ -1,0 +1,26 @@
+/* Añadir al final de src/styles.css */
+.estudiantes-encabezado { display:flex; justify-content:space-between; align-items:flex-start; gap:16px; flex-wrap:wrap; }
+.accion-principal,.accion-secundaria,.error-api button { border:0; border-radius:7px; padding:10px 14px; font-weight:700; }
+.accion-principal { background:var(--verde-700); color:#fff; }
+.accion-principal:hover { background:var(--verde-900); }
+.accion-principal:disabled,.accion-secundaria:disabled { opacity:.6; cursor:wait; }
+.accion-secundaria { background:#e8eeee; color:var(--tinta); }
+.aviso-operacion { margin:14px 0; padding:10px 12px; border-radius:6px; background:var(--menta-50); border:1px solid var(--menta-100); font-size:13px; }
+.error-api { margin:16px 0; padding:12px; border:1px solid #efb5b5; border-radius:8px; color:#8e2424; background:#fff7f7; }
+.error-api button { background:#8e2424; color:#fff; }
+.estado-tabla { padding:35px; text-align:center; }
+.acciones-api { white-space:nowrap; }
+.acciones-api button { margin-right:9px; }
+.acciones-api .accion-eliminar { color:#a32626; }
+.nota-api { margin:14px 0 0; color:#566; font-size:12px; line-height:1.5; }
+.modal-fondo { position:fixed; z-index:1000; inset:0; display:grid; place-items:center; padding:18px; background:rgba(9,30,30,.58); }
+.modal-estudiante { width:min(520px,100%); max-height:90vh; overflow:auto; background:#fff; border-radius:14px; padding:22px; box-shadow:0 18px 60px rgba(0,0,0,.25); }
+.modal-estudiante__cabecera { display:flex; justify-content:space-between; align-items:center; gap:12px; margin-bottom:16px; }
+.modal-estudiante__cabecera h2 { margin:0; font-size:20px; }
+.modal-estudiante__cabecera button { border:0; background:transparent; font-size:28px; }
+.modal-estudiante form { display:grid; gap:13px; }
+.modal-estudiante form label { display:grid; gap:6px; font-size:13px; font-weight:700; }
+.modal-estudiante input,.modal-estudiante select { width:100%; min-height:40px; border:1px solid var(--linea); border-radius:6px; padding:8px 10px; background:white; }
+.modal-estudiante input:disabled,.modal-estudiante select:disabled { background:#f4f6f6; color:#596; }
+.modal-estudiante__acciones { display:flex; justify-content:flex-end; gap:10px; margin-top:8px; }
+@media (max-width:820px) { .estudiantes-encabezado { align-items:stretch; } .estudiantes-encabezado .accion-principal { align-self:flex-start; } }

@@ -6,7 +6,7 @@ import "./styles.css";
 
 createRoot(document.getElementById("root")).render(
   <React.StrictMode>
-    <BrowserRouter>
+    <BrowserRouter basename="/t3_act8_eq05">
       <App />
     </BrowserRouter>
   </React.StrictMode>
