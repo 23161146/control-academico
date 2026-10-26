@@ -322,7 +322,6 @@ export default function Estudiantes() {
                   <tr>
                     <th>Nombre</th>
                     <th>Correo</th>
-                    <th>Género</th>
                     <th>Carrera</th>
                     <th>Semestre</th>
                     <th>Acciones</th>
@@ -333,7 +332,6 @@ export default function Estudiantes() {
                     <tr key={alumno.id}>
                       <td>{alumno.nombre}</td>
                       <td>{alumno.correo || "Sin correo"}</td>
-                      <td>{alumno.gender || "No especificado"}</td>
                       <td>{alumno.carrera}</td>
                       <td>{alumno.semestre}°</td>
                       <td className="acciones acciones-api">
@@ -351,7 +349,7 @@ export default function Estudiantes() {
                   ))}
                   {visibles.length === 0 && (
                     <tr>
-                      <td colSpan="6" className="vacio">
+                      <td colSpan="5" className="vacio">
                         No hay alumnos que coincidan con los filtros.
                       </td>
                     </tr>
@@ -415,7 +413,7 @@ export default function Estudiantes() {
 
             <p className="nota-api">
               La paginación se refleja en la URL con <code>page</code> y{" "}
-              <code>limit</code>. Los nombres y el género proceden de Mockaroo;
+              <code>limit</code>. Los nombres y apellidos proceden de Mockaroo;
               el correo se construye con el nombre, apellido e ID del alumno.
               El CRUD modifica solo esta tabla durante la sesión.
             </p>
