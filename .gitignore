@@ -1,0 +1,10 @@
+# Dependencias instaladas por npm
+node_modules/
+
+# Compilado generado por Vite
+dist/
+
+# Variables de entorno (contienen la API key)
+.env
+.env.local
+.env.*.local
