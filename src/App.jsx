@@ -4,6 +4,7 @@ import Layout from "./components/Layout.jsx";
 import Login from "./pages/Login.jsx";
 import Inicio from "./pages/Inicio.jsx";
 import Estudiantes from "./pages/Estudiantes.jsx";
+import InformacionAcademica from "./pages/InformacionAcademica.jsx";
 
 const Pendiente = ({ titulo }) => (
   <section className="page">
@@ -40,6 +41,7 @@ export default function App() {
       <Route element={usuario ? <Layout usuario={usuario} onLogout={salir} /> : <Navigate to="/" replace />}>
         <Route path="/inicio" element={<Inicio />} />
         <Route path="/estudiantes" element={<Estudiantes />} />
+        <Route path="/informacion" element={<InformacionAcademica />} />
         <Route path="/reportes" element={<Pendiente titulo="Reportes" />} />
         <Route path="/horario" element={<Pendiente titulo="Horario" />} />
       </Route>

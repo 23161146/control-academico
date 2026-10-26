@@ -1,23 +1,23 @@
 .dashboard { display: grid; gap: 1.25rem; padding: 1.5rem; max-width: 1200px; margin: 0 auto; }
-.stats { display: grid; gap: 1rem; grid-template-columns: repeat(auto-fit, minmax(190px, 1fr)); }
-.stat-card { background: #fff; border: 1px solid #d9dee2; border-left: 4px solid #1f4e5f; border-radius: 6px; padding: 1rem 1.1rem; }
-.stat-card__valor { margin: 0; font-size: 2rem; font-weight: 700; color: #1f4e5f; }
-.stat-card__titulo { margin: .25rem 0 0; font-size: .95rem; font-weight: 600; }
-.stat-card__detalle { margin: .2rem 0 0; font-size: .8rem; color: #5b6770; }
-.panel { background: #fff; border: 1px solid #d9dee2; border-radius: 6px; padding: 1.1rem; }
-.panel h2 { margin: 0 0 .9rem; font-size: 1.1rem; }
-.panel__encabezado { display: flex; flex-wrap: wrap; gap: .75rem; justify-content: space-between; align-items: center; }
-.panel__encabezado h2 { margin: 0; }
-.buscador { padding: .5rem .7rem; border: 1px solid #b8c0c6; border-radius: 4px; min-width: 260px; font: inherit; }
-.tabla-scroll { overflow-x: auto; margin-top: .9rem; }
-.tabla { width: 100%; border-collapse: collapse; font-size: .9rem; }
-.tabla th, .tabla td { text-align: left; padding: .55rem .6rem; border-bottom: 1px solid #e6eaed; white-space: nowrap; }
-.tabla th button { all: unset; cursor: pointer; font-weight: 600; }
-.tabla th button:focus-visible { outline: 2px solid #1f4e5f; outline-offset: 2px; }
-.tabla__vacia { text-align: center; color: #5b6770; padding: 1.5rem; }
-.etiqueta { padding: .15rem .55rem; border-radius: 999px; font-size: .78rem; font-weight: 600; }
-.etiqueta--ok { background: #dff3e6; color: #17603a; }
-.etiqueta--no { background: #fbe0e0; color: #8a1f1f; }
-.paginacion { display: flex; flex-wrap: wrap; gap: .5rem; justify-content: space-between; align-items: center; margin-top: .9rem; font-size: .85rem; }
-.paginacion button { margin-left: .4rem; padding: .35rem .8rem; border: 1px solid #1f4e5f; background: #fff; color: #1f4e5f; border-radius: 4px; cursor: pointer; }
-.paginacion button:disabled { opacity: .4; cursor: not-allowed; }
+.dashboard .stats { display: grid; gap: 1rem; grid-template-columns: repeat(auto-fit, minmax(190px, 1fr)); }
+.dashboard .stat-card { background: #fff; border: 1px solid #d9dee2; border-left: 4px solid #1f4e5f; border-radius: 6px; padding: 1rem 1.1rem; }
+.dashboard .stat-card__valor { margin: 0; font-size: 2rem; font-weight: 700; color: #1f4e5f; }
+.dashboard .stat-card__titulo { margin: .25rem 0 0; font-size: .95rem; font-weight: 600; }
+.dashboard .stat-card__detalle { margin: .2rem 0 0; font-size: .8rem; color: #5b6770; }
+.dashboard .panel { background: #fff; border: 1px solid #d9dee2; border-radius: 6px; padding: 1.1rem; }
+.dashboard .panel h2 { margin: 0 0 .9rem; font-size: 1.1rem; }
+.dashboard .panel__encabezado { display: flex; flex-wrap: wrap; gap: .75rem; justify-content: space-between; align-items: center; }
+.dashboard .panel__encabezado h2 { margin: 0; }
+.dashboard .buscador { padding: .5rem .7rem; border: 1px solid #b8c0c6; border-radius: 4px; min-width: 260px; font: inherit; }
+.dashboard .tabla-scroll { overflow-x: auto; margin-top: .9rem; }
+.dashboard .tabla { width: 100%; border-collapse: collapse; font-size: .9rem; }
+.dashboard .tabla th, .tabla td { text-align: left; padding: .55rem .6rem; border-bottom: 1px solid #e6eaed; white-space: nowrap; }
+.dashboard .tabla th button { all: unset; cursor: pointer; font-weight: 600; }
+.dashboard .tabla th button:focus-visible { outline: 2px solid #1f4e5f; outline-offset: 2px; }
+.dashboard .tabla__vacia { text-align: center; color: #5b6770; padding: 1.5rem; }
+.dashboard .etiqueta { padding: .15rem .55rem; border-radius: 999px; font-size: .78rem; font-weight: 600; }
+.dashboard .etiqueta--ok { background: #dff3e6; color: #17603a; }
+.dashboard .etiqueta--no { background: #fbe0e0; color: #8a1f1f; }
+.dashboard .paginacion { display: flex; flex-wrap: wrap; gap: .5rem; justify-content: space-between; align-items: center; margin-top: .9rem; font-size: .85rem; }
+.dashboard .paginacion button { margin-left: .4rem; padding: .35rem .8rem; border: 1px solid #1f4e5f; background: #fff; color: #1f4e5f; border-radius: 4px; cursor: pointer; }
+.dashboard .paginacion button:disabled { opacity: .4; cursor: not-allowed; }

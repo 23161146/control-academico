@@ -4,14 +4,32 @@ import localData from "../data/alumnos.json";
 // se usa esa API. Si no existe o falla, se usan los datos locales.
 const API_URL = import.meta.env.VITE_API_URL;
 
-const CAMPOS = ["matricula", "nombre", "materia", "calificacion", "asistencia"];
+// Columnas que debe traer la API (en Mockaroo, el nombre de cada campo).
+// "id" y "estatus" son opcionales: si faltan se calculan aquí.
+const CAMPOS = ["matricula", "nombre", "carrera", "semestre", "materia", "calificacion", "asistencia"];
 
-// Revisa que la respuesta sea un arreglo con las columnas que usa la tabla.
+// Convierte cada registro al formato que usa la tabla.
+function normalizar(datos) {
+  return datos.map((a, i) => {
+    const calificacion = Number(a.calificacion);
+    return {
+      ...a,
+      id: a.id ?? i + 1,
+      calificacion,
+      asistencia: Number(a.asistencia),
+      semestre: Number(a.semestre),
+      estatus: a.estatus ?? (calificacion >= 6 ? "Aprobado" : "Reprobado"),
+    };
+  });
+}
+
+// Revisa que la respuesta sea un arreglo con las columnas esperadas y números válidos.
 function esValido(datos) {
   return (
     Array.isArray(datos) &&
     datos.length > 0 &&
-    CAMPOS.every((c) => c in datos[0])
+    CAMPOS.every((c) => c in datos[0]) &&
+    datos.every((a) => !Number.isNaN(a.calificacion) && !Number.isNaN(a.asistencia))
   );
 }
 
@@ -20,14 +38,13 @@ export async function getAlumnos() {
   try {
     const res = await fetch(API_URL);
     if (!res.ok) throw new Error(`HTTP ${res.status}`);
-    const datos = (await res.json()).map((a) => ({
-      ...a,
-      calificacion: Number(a.calificacion),
-      asistencia: Number(a.asistencia),
-      semestre: Number(a.semestre),
-    }));
+    const crudos = await res.json();
+    if (!Array.isArray(crudos) || crudos.length === 0) {
+      throw new Error("La API no devolvió un arreglo de alumnos");
+    }
+    const datos = normalizar(crudos);
     if (!esValido(datos)) {
-      throw new Error("La API no devuelve las columnas esperadas (revisa el esquema en Mockaroo)");
+      throw new Error(`La API debe devolver las columnas: ${CAMPOS.join(", ")} (revisa el esquema en Mockaroo)`);
     }
     return datos;
   } catch (err) {

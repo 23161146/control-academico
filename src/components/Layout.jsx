@@ -6,6 +6,7 @@ import avatar from "../assets/avatar.jpg";
 const enlaces = [
   { to: "/inicio", texto: "Inicio", icono: <IconHome /> },
   { to: "/estudiantes", texto: "Estudiantes", icono: <IconUsers /> },
+  { to: "/informacion", texto: "Información académica", icono: <IconBars /> },
   { to: "/reportes", texto: "Reportes", icono: <IconBars /> },
   { to: "/horario", texto: "Horario", icono: <IconBars /> },
 ];

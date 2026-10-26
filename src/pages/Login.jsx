@@ -53,8 +53,8 @@ export default function Login({ onLogin }) {
           <label htmlFor="correo">Usuario</label>
           <input
             id="correo"
-            type="email"
-            autoComplete="email"
+            type="text"
+            autoComplete="username"
             placeholder="ej. emilys"
             value={correo}
             onChange={(e) => setCorreo(e.target.value)}
