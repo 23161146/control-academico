@@ -20,6 +20,7 @@ export default function App() {
   });
 
   const entrar = (userData) => {
+    localStorage.removeItem("estadisticasInicio");
     setUsuario(userData); // Guardar el objeto completo del usuario
   };
 
@@ -27,6 +28,7 @@ export default function App() {
     localStorage.removeItem("token");
     localStorage.removeItem("user");
     localStorage.removeItem("usuario");
+    localStorage.removeItem("estadisticasInicio");
     sessionStorage.removeItem("token");
     sessionStorage.removeItem("user");
     setUsuario(null);
