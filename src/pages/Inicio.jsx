@@ -1,9 +1,11 @@
 import { useEffect, useState } from "react";
 import { carreras, estudiantesPorCarrera } from "../data/estudiantes.js";
+import {
+  obtenerDatosGrafica,
+  obtenerEstudiantesActivos,
+  obtenerTotalEstudiantes,
+} from "../services/inicioService.js";
 
-const API_TOTAL = "https://dumbapis.com/number?min=860&max=872";
-const API_ACTIVOS = "https://dumbapis.com/number?min=780&max=820";
-const API_GRAFICA = "https://www.randomnumberapi.com/api/v1.0/random?min=70&max=221&count=7";
 const CACHE_KEY = "estadisticasInicio";
 const MAX = 240;
 const ticks = [240, 180, 120, 60, 0];
@@ -40,7 +42,7 @@ export default function Inicio() {
   const [total, setTotal] = useState(() => leerCache()?.total ?? null);
   const [activos, setActivos] = useState(() => leerCache()?.activos ?? null);
   const [grafica, setGrafica] = useState(() => leerCache()?.grafica ?? estudiantesPorCarrera);
-  const [error, setError] = useState(false);
+  const [error, setError] = useState("");
 
   useEffect(() => {
     const cache = leerCache();
@@ -61,59 +63,35 @@ export default function Inicio() {
       }
     };
 
-    fetch(API_TOTAL, { signal: controlador.signal })
-      .then((response) => {
-        if (!response.ok) {
-          throw new Error("No se pudo obtener el total de estudiantes.");
-        }
-        return response.json();
-      })
-      .then((data) => {
-        nuevoTotal = data.result;
-        setTotal(data.result);
-        guardar();
-      })
-      .catch((err) => {
-        if (err.name !== "AbortError") {
-          setError(true);
-        }
-      });
+    const manejarError = (err) => {
+      if (err.name !== "AbortError") {
+        setError(err.message || "No se pudieron cargar algunas estadísticas.");
+      }
+    };
 
-    fetch(API_ACTIVOS, { signal: controlador.signal })
-      .then((response) => {
-        if (!response.ok) {
-          throw new Error("No se pudieron obtener los estudiantes activos.");
-        }
-        return response.json();
-      })
-      .then((data) => {
-        nuevosActivos = data.result;
-        setActivos(data.result);
+    obtenerTotalEstudiantes({ signal: controlador.signal })
+      .then((totalEstudiantes) => {
+        nuevoTotal = totalEstudiantes;
+        setTotal(totalEstudiantes);
         guardar();
       })
-      .catch((err) => {
-        if (err.name !== "AbortError") {
-          setError(true);
-        }
-      });
+      .catch(manejarError);
 
-    fetch(API_GRAFICA, { signal: controlador.signal })
-      .then((response) => {
-        if (!response.ok) {
-          throw new Error("No se pudieron obtener los datos de la gráfica.");
-        }
-        return response.json();
-      })
-      .then((data) => {
-        nuevaGrafica = data;
-        setGrafica(data);
+    obtenerEstudiantesActivos({ signal: controlador.signal })
+      .then((estudiantesActivos) => {
+        nuevosActivos = estudiantesActivos;
+        setActivos(estudiantesActivos);
         guardar();
       })
-      .catch((err) => {
-        if (err.name !== "AbortError") {
-          setError(true);
-        }
-      });
+      .catch(manejarError);
+
+    obtenerDatosGrafica({ signal: controlador.signal })
+      .then((datosGrafica) => {
+        nuevaGrafica = datosGrafica;
+        setGrafica(datosGrafica);
+        guardar();
+      })
+      .catch(manejarError);
 
     return () => controlador.abort();
   }, []);
@@ -128,7 +106,7 @@ export default function Inicio() {
         <Stat titulo="Estudiantes activos" valor={activos ?? "—"} detalle="Estudiantes cursando este semestre" />
       </div>
 
-      {error && <p className="page__sub" role="alert">No se pudieron cargar algunas estadísticas.</p>}
+      {error && <p className="page__sub" role="alert">{error}</p>}
 
       <article className="card chart">
         <h2>Estudiantes por carrera</h2>

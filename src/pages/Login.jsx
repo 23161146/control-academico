@@ -6,34 +6,59 @@ import { iniciarSesion } from "../services/validacionLogin.js";
 
 export default function Login({ onLogin }) {
   const navigate = useNavigate();
-  const [correo, setCorreo] = useState("");
-  const [clave, setClave] = useState("");
-  const [verClave, setVerClave] = useState(false);
-  const [recordar, setRecordar] = useState(false);
-  const [error, setError] = useState("");
-  const [cargando, setCargando] = useState(false);
+  const [usuario, setUsuario] = useState("");
+  const [contrasena, setContrasena] = useState("");
+  const [mostrarContrasena, setMostrarContrasena] = useState(false);
+  const [recordarSesion, setRecordarSesion] = useState(false);
+  const [mensajeError, setMensajeError] = useState("");
+  const [enviando, setEnviando] = useState(false);
 
-  const enviar = async (e) => {
-    e.preventDefault();
-    if (cargando) return;
-    if (!correo.trim()) return setError("Ingresa un nombre de usuario válido.");
-    if (clave.length < 4) return setError("La contraseña debe tener al menos 4 caracteres.");
-    setError("");
-    setCargando(true);
+  const manejarInicioSesion = async (evento) => {
+    evento.preventDefault();
+
+    if (enviando) {
+      return;
+    }
+
+    const usuarioLimpio = usuario.trim();
+
+    if (!usuarioLimpio) {
+      setMensajeError("Ingresa tu usuario.");
+      return;
+    }
+
+    if (!contrasena) {
+      setMensajeError("Ingresa tu contraseña.");
+      return;
+    }
+
+    if (contrasena.length < 4) {
+      setMensajeError("La contraseña debe tener al menos 4 caracteres.");
+      return;
+    }
+
+    setMensajeError("");
+    setEnviando(true);
+
     try {
-      const data = await iniciarSesion(correo.trim(), clave);
-      const storage = recordar ? localStorage : sessionStorage;
-      const otroStorage = recordar ? sessionStorage : localStorage;
-      otroStorage.removeItem("token");
-      otroStorage.removeItem("user");
-      storage.setItem("token", data.accessToken);
-      storage.setItem("user", JSON.stringify(data));
-      onLogin(data);
+      const datosUsuario = await iniciarSesion(usuarioLimpio, contrasena);
+      const almacenamiento = recordarSesion ? localStorage : sessionStorage;
+      const otroAlmacenamiento = recordarSesion
+        ? sessionStorage
+        : localStorage;
+
+      otroAlmacenamiento.removeItem("token");
+      otroAlmacenamiento.removeItem("user");
+      almacenamiento.setItem("token", datosUsuario.accessToken);
+      almacenamiento.setItem("user", JSON.stringify(datosUsuario));
+      onLogin(datosUsuario);
       navigate("/inicio", { replace: true });
-    } catch (err) {
-      setError(err.message || "No fue posible iniciar sesión. Comprueba tu conexión.");
+    } catch (error) {
+      setMensajeError(
+        error.message || "No fue posible iniciar sesión. Comprueba tu conexión."
+      );
     } finally {
-      setCargando(false);
+      setEnviando(false);
     }
   };
 
@@ -42,36 +67,80 @@ export default function Login({ onLogin }) {
       <span className="login__blob login__blob--a" />
       <span className="login__blob login__blob--b" />
       <div className="login__card">
-        <img className="login__photo" src={foto} alt="Estudiantes y docente trabajando en una biblioteca" />
-        <form className="login__form" onSubmit={enviar} noValidate>
-          <p className="login__brand">Control Académico</p>
+        <img
+          className="login__photo"
+          src={foto}
+          alt="Estudiantes y docente trabajando en una biblioteca"
+        />
+        <form
+          className="login__form"
+          onSubmit={manejarInicioSesion}
+          noValidate
+        >
+          <p className="login__brand">SITUA</p>
           <h1>Iniciar sesión</h1>
           <p className="login__sub">Ingresa tus datos para continuar</p>
-          <label htmlFor="correo">Usuario</label>
-          <input id="correo" type="text" autoComplete="username" placeholder="ej. emilys" value={correo}
-            onChange={(e) => setCorreo(e.target.value)} disabled={cargando} />
-          <label htmlFor="clave">Contraseña</label>
+          <label htmlFor="usuario">Usuario</label>
+          <input
+            id="usuario"
+            type="text"
+            autoComplete="username"
+            placeholder="Tu usuario"
+            value={usuario}
+            onChange={(evento) => {
+              setUsuario(evento.target.value);
+              if (mensajeError) {
+                setMensajeError("");
+              }
+            }}
+            disabled={enviando}
+          />
+          <label htmlFor="contrasena">Contraseña</label>
           <div className="login__pass">
-            <input id="clave" type={verClave ? "text" : "password"} autoComplete="current-password"
-              placeholder="••••••••" value={clave} onChange={(e) => setClave(e.target.value)} disabled={cargando} />
-            <button type="button" aria-label={verClave ? "Ocultar contraseña" : "Mostrar contraseña"}
-              onClick={() => setVerClave((v) => !v)} disabled={cargando}>
-              <IconEye off={verClave} />
+            <input
+              id="contrasena"
+              type={mostrarContrasena ? "text" : "password"}
+              autoComplete="current-password"
+              placeholder="••••••••"
+              value={contrasena}
+              onChange={(evento) => {
+                setContrasena(evento.target.value);
+                if (mensajeError) {
+                  setMensajeError("");
+                }
+              }}
+              disabled={enviando}
+            />
+            <button
+              type="button"
+              aria-label={
+                mostrarContrasena ? "Ocultar contraseña" : "Mostrar contraseña"
+              }
+              onClick={() => setMostrarContrasena((visible) => !visible)}
+              disabled={enviando}
+            >
+              <IconEye off={mostrarContrasena} />
             </button>
           </div>
           <div className="login__row">
             <label className="login__check">
-              <input type="checkbox" checked={recordar} onChange={(e) => setRecordar(e.target.checked)} disabled={cargando} />
+              <input
+                type="checkbox"
+                checked={recordarSesion}
+                onChange={(evento) => setRecordarSesion(evento.target.checked)}
+                disabled={enviando}
+              />
               Recordar inicio de sesión
             </label>
           </div>
-          {error && <p className="login__error" role="alert">{error}</p>}
-          <button className="login__submit" type="submit" disabled={cargando}>
-            {cargando ? "Verificando…" : "Iniciar sesión"}
+          {mensajeError && (
+            <p className="login__error" role="alert">
+              {mensajeError}
+            </p>
+          )}
+          <button className="login__submit" type="submit" disabled={enviando}>
+            {enviando ? "Verificando…" : "Iniciar sesión"}
           </button>
-          <p className="login__sub" style={{ marginTop: 14, fontSize: 12 }}>
-            Cuenta de demostración: usuario <strong>emilys</strong>
-          </p>
         </form>
       </div>
     </div>

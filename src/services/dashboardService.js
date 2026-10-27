@@ -33,8 +33,11 @@ function esValido(datos) {
   );
 }
 
-export async function getAlumnos() {
-  if (!API_URL) return localData;
+export async function obtenerAlumnos() {
+  if (!API_URL) {
+    return { alumnos: localData, aviso: "" };
+  }
+
   try {
     const res = await fetch(API_URL);
     if (!res.ok) throw new Error(`HTTP ${res.status}`);
@@ -46,10 +49,12 @@ export async function getAlumnos() {
     if (!esValido(datos)) {
       throw new Error(`La API debe devolver las columnas: ${CAMPOS.join(", ")} (revisa el esquema en Mockaroo)`);
     }
-    return datos;
-  } catch (err) {
-    console.warn("No se pudo usar la API, se usan datos locales:", err);
-    return localData;
+    return { alumnos: datos, aviso: "" };
+  } catch {
+    return {
+      alumnos: localData,
+      aviso: "No se pudo consultar la API; se muestran datos locales.",
+    };
   }
 }
 

@@ -13,12 +13,28 @@ const Pendiente = ({ titulo }) => (
   </section>
 );
 
+function leerUsuarioGuardado() {
+  const guardado =
+    localStorage.getItem("user") || sessionStorage.getItem("user");
+
+  if (!guardado) {
+    return null;
+  }
+
+  try {
+    return JSON.parse(guardado);
+  } catch {
+    localStorage.removeItem("token");
+    localStorage.removeItem("user");
+    sessionStorage.removeItem("token");
+    sessionStorage.removeItem("user");
+    return null;
+  }
+}
+
 export default function App() {
   // Leer el objeto completo del usuario si ya estaba guardado
-  const [usuario, setUsuario] = useState(() => {
-    const guardado = localStorage.getItem("user") || sessionStorage.getItem("user");
-    return guardado ? JSON.parse(guardado) : null;
-  });
+  const [usuario, setUsuario] = useState(leerUsuarioGuardado);
 
   const entrar = (userData) => {
     localStorage.removeItem("estadisticasInicio");
