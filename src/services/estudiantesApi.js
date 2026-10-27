@@ -1,4 +1,4 @@
-const API_URL = "https://my.api.mockaroo.com/alumnos.json?key=ce026c10";
+const API_URL = "https://my.api.mockaroo.com/alumnos.json?key=68307140";
 
 function adaptarEstudiante(alumno, indice = 0) {
   const nombrePila = String(alumno.first_name ?? "").trim();
@@ -30,9 +30,7 @@ export async function obtenerEstudiantes({ signal } = {}) {
   }
 
   if (!respuesta.ok) {
-    throw new Error(
-      `No se pudieron cargar los estudiantes (HTTP ${respuesta.status}).`
-    );
+    throw new Error(`No se pudieron cargar los estudiantes (HTTP ${respuesta.status}).`);
   }
 
   let datos;
@@ -40,15 +38,11 @@ export async function obtenerEstudiantes({ signal } = {}) {
   try {
     datos = await respuesta.json();
   } catch {
-    throw new Error(
-      "El servicio de estudiantes devolvió una respuesta no válida."
-    );
+    throw new Error("El servicio de estudiantes devolvió una respuesta no válida.");
   }
 
   if (!Array.isArray(datos)) {
-    throw new Error(
-      "El servicio de estudiantes no devolvió una lista válida."
-    );
+    throw new Error("El servicio de estudiantes no devolvió una lista válida.");
   }
 
   return datos.map(adaptarEstudiante);
